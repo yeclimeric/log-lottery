@@ -1,156 +1,156 @@
 <script setup lang='ts'>
-import { ref, watch, onMounted } from 'vue'
-import useStore from '@/store'
-import { storeToRefs } from 'pinia'
-import { themeChange } from 'theme-change';
-import zod from 'zod';
-import daisyuiThemes from 'daisyui/src/theming/themes'
-import { ColorPicker } from 'vue3-colorpicker';
-import 'vue3-colorpicker/style.css';
-import { isRgbOrRgba, isHex } from '@/utils/color'
-import PatternSetting from './components/PatternSetting.vue'
+    import { ref, watch, onMounted } from 'vue'
+    import useStore from '@/store'
+    import { storeToRefs } from 'pinia'
+    import { themeChange } from 'theme-change';
+    import zod from 'zod';
+    import daisyuiThemes from 'daisyui/src/theming/themes'
+    import { ColorPicker } from 'vue3-colorpicker';
+    import 'vue3-colorpicker/style.css';
+    import { isRgbOrRgba, isHex } from '@/utils/color'
+    import PatternSetting from './components/PatternSetting.vue'
 
-const globalConfig = useStore().globalConfig
-const personConfig = useStore().personConfig
-const prizeConfig= useStore().prizeConfig
-const { getTopTitle: topTitle, getTheme: localTheme, getPatterColor: patternColor, getPatternList: patternList, getCardColor: cardColor, getLuckyColor: luckyCardColor, getTextColor: textColor, getCardSize: cardSize, getTextSize: textSize, getRowCount: rowCount, getIsShowPrizeList: isShowPrizeList } = storeToRefs(globalConfig)
-const { getAlreadyPersonList: alreadyPersonList, getNotPersonList: notPersonList } = storeToRefs(personConfig)
-const colorPickerRef = ref()
-const resetDataDialogRef=ref()
-interface ThemeDaType {
-    [key: string]: any
-}
-const isRowCountChange = ref(0) //0未改变，1改变,2加载中
-const themeValue = ref(localTheme.value.name)
-const topTitleValue = ref(structuredClone(topTitle.value))
-const cardColorValue = ref(structuredClone(cardColor.value))
-const luckyCardColorValue = ref(structuredClone(luckyCardColor.value))
-const textColorValue = ref(structuredClone(textColor.value))
-const cardSizeValue = ref(structuredClone(cardSize.value))
-const textSizeValue = ref(structuredClone(textSize.value))
-const rowCountValue = ref(structuredClone(rowCount.value))
-const isShowPrizeListValue = ref(structuredClone(isShowPrizeList.value))
-const patternColorValue = ref(structuredClone(patternColor.value))
-const themeList = ref(Object.keys(daisyuiThemes))
-const daisyuiThemeList = ref<ThemeDaType>(daisyuiThemes)
-const formData = ref({
-    rowCount: rowCountValue,
-})
-const formErr = ref({
-    rowCount: '',
-})
-
-const schema = zod.object({
-    rowCount: zod.number({
-        required_error: '必填项',
-        invalid_type_error: '必须填入数字',
+    const globalConfig = useStore().globalConfig
+    const personConfig = useStore().personConfig
+    const prizeConfig = useStore().prizeConfig
+    const { getTopTitle: topTitle, getTheme: localTheme, getPatterColor: patternColor, getPatternList: patternList, getCardColor: cardColor, getLuckyColor: luckyCardColor, getTextColor: textColor, getCardSize: cardSize, getTextSize: textSize, getRowCount: rowCount, getIsShowPrizeList: isShowPrizeList } = storeToRefs(globalConfig)
+    const { getAlreadyPersonList: alreadyPersonList, getNotPersonList: notPersonList } = storeToRefs(personConfig)
+    const colorPickerRef = ref()
+    const resetDataDialogRef = ref()
+    interface ThemeDaType {
+        [key: string]: any
+    }
+    const isRowCountChange = ref(0) //0未改变，1改变,2加载中
+    const themeValue = ref(localTheme.value.name)
+    const topTitleValue = ref(structuredClone(topTitle.value))
+    const cardColorValue = ref(structuredClone(cardColor.value))
+    const luckyCardColorValue = ref(structuredClone(luckyCardColor.value))
+    const textColorValue = ref(structuredClone(textColor.value))
+    const cardSizeValue = ref(structuredClone(cardSize.value))
+    const textSizeValue = ref(structuredClone(textSize.value))
+    const rowCountValue = ref(structuredClone(rowCount.value))
+    const isShowPrizeListValue = ref(structuredClone(isShowPrizeList.value))
+    const patternColorValue = ref(structuredClone(patternColor.value))
+    const themeList = ref(Object.keys(daisyuiThemes))
+    const daisyuiThemeList = ref<ThemeDaType>(daisyuiThemes)
+    const formData = ref({
+        rowCount: rowCountValue,
     })
-        .min(1, '最小为1')
-        .max(100, '最大为100')
-    // 格式化
-
-
-})
-type ValidatePayload = zod.infer<typeof schema>
-const payload: ValidatePayload = {
-    rowCount: formData.value.rowCount,
-}
-const parseSchema = (props: ValidatePayload) => {
-    return schema.parseAsync(props)
-}
-
-const resetPersonLayout = () => {
-    isRowCountChange.value = 2
-    setTimeout(() => {
-        const alreadyLen = alreadyPersonList.value.length
-        const notLen = notPersonList.value.length
-        if (alreadyLen <= 0 && notLen <= 0) {
-            return
-        }
-        const allPersonList = alreadyPersonList.value.concat(notPersonList.value)
-        const newAlreadyPersonList = allPersonList.slice(0, alreadyLen)
-        const newNotPersonList = allPersonList.slice(alreadyLen, notLen + alreadyLen)
-        personConfig.deleteAllPerson()
-        personConfig.addNotPersonList(newNotPersonList)
-        personConfig.addAlreadyPersonList(newAlreadyPersonList, null)
-
-        isRowCountChange.value = 0
-    }, 1000)
-}
-
-const clearPattern = () => {
-    globalConfig.setPatternList([] as number[])
-}
-const resetPattern = () => {
-    globalConfig.resetPatternList()
-}
-
-const resetData=()=>{
-    globalConfig.reset();
-    personConfig.reset();
-    prizeConfig.resetDefault();
-    // 刷新页面
-    window.location.reload()
-}
-
-// const handleChangeShowFields = (fieldItem: any) => {
-//     formData.value.showField.map((item) => {
-//         if (item.label === fieldItem.label) {
-//             item.value = !item.value
-//         }
-//     })
-// }
-
-watch(() => formData.value.rowCount, () => {
-    payload.rowCount = formData.value.rowCount
-    parseSchema(payload).then(res => {
-        if (res.rowCount) {
-            isRowCountChange.value = 1
-            globalConfig.setRowCount(res.rowCount)
-        }
+    const formErr = ref({
+        rowCount: '',
     })
-        .catch(err => {
-            formErr.value.rowCount = err.issues[0].message
+
+    const schema = zod.object({
+        rowCount: zod.number({
+            required_error: '必填项',
+            invalid_type_error: '必须填入数字',
         })
-})
-watch(topTitleValue, (val) => {
-    globalConfig.setTopTitle(val)
-}),
+            .min(1, '最小为1')
+            .max(100, '最大为100')
+        // 格式化
 
-    watch(themeValue, (val: any) => {
-        const selectedThemeDetail = daisyuiThemeList.value[val]
-        globalConfig.setTheme({ name: val, detail: selectedThemeDetail })
-        themeChange(val)
-        if (selectedThemeDetail.primary && (isHex(selectedThemeDetail.primary) || isRgbOrRgba(selectedThemeDetail.primary))) {
-            globalConfig.setCardColor(selectedThemeDetail.primary)
-        }
+
+    })
+    type ValidatePayload = zod.infer<typeof schema>
+    const payload: ValidatePayload = {
+        rowCount: formData.value.rowCount,
+    }
+    const parseSchema = (props: ValidatePayload) => {
+        return schema.parseAsync(props)
+    }
+
+    const resetPersonLayout = () => {
+        isRowCountChange.value = 2
+        setTimeout(() => {
+            const alreadyLen = alreadyPersonList.value.length
+            const notLen = notPersonList.value.length
+            if (alreadyLen <= 0 && notLen <= 0) {
+                return
+            }
+            const allPersonList = alreadyPersonList.value.concat(notPersonList.value)
+            const newAlreadyPersonList = allPersonList.slice(0, alreadyLen)
+            const newNotPersonList = allPersonList.slice(alreadyLen, notLen + alreadyLen)
+            personConfig.deleteAllPerson()
+            personConfig.addNotPersonList(newNotPersonList)
+            personConfig.addAlreadyPersonList(newAlreadyPersonList, null)
+
+            isRowCountChange.value = 0
+        }, 1000)
+    }
+
+    const clearPattern = () => {
+        globalConfig.setPatternList([] as number[])
+    }
+    const resetPattern = () => {
+        globalConfig.resetPatternList()
+    }
+
+    const resetData = () => {
+        globalConfig.reset();
+        personConfig.reset();
+        prizeConfig.resetDefault();
+        // 刷新页面
+        window.location.reload()
+    }
+
+    // const handleChangeShowFields = (fieldItem: any) => {
+    //     formData.value.showField.map((item) => {
+    //         if (item.label === fieldItem.label) {
+    //             item.value = !item.value
+    //         }
+    //     })
+    // }
+
+    watch(() => formData.value.rowCount, () => {
+        payload.rowCount = formData.value.rowCount
+        parseSchema(payload).then(res => {
+            if (res.rowCount) {
+                isRowCountChange.value = 1
+                globalConfig.setRowCount(res.rowCount)
+            }
+        })
+            .catch(err => {
+                formErr.value.rowCount = err.issues[0].message
+            })
+    })
+    watch(topTitleValue, (val) => {
+        globalConfig.setTopTitle(val)
+    }),
+
+        watch(themeValue, (val: any) => {
+            const selectedThemeDetail = daisyuiThemeList.value[val]
+            globalConfig.setTheme({ name: val, detail: selectedThemeDetail })
+            themeChange(val)
+            if (selectedThemeDetail.primary && (isHex(selectedThemeDetail.primary) || isRgbOrRgba(selectedThemeDetail.primary))) {
+                globalConfig.setCardColor(selectedThemeDetail.primary)
+            }
+        }, { deep: true })
+
+    watch(cardColorValue, (val: string) => {
+        globalConfig.setCardColor(val)
+    }, { deep: true })
+    watch(luckyCardColorValue, (val: string) => {
+        globalConfig.setLuckyCardColor(val)
+    }, { deep: true })
+    watch(patternColorValue, (val: string) => {
+        globalConfig.setPatterColor(val)
+    })
+    watch(textColorValue, (val: string) => {
+        globalConfig.setTextColor(val)
     }, { deep: true })
 
-watch(cardColorValue, (val: string) => {
-    globalConfig.setCardColor(val)
-}, { deep: true })
-watch(luckyCardColorValue, (val: string) => {
-    globalConfig.setLuckyCardColor(val)
-}, { deep: true })
-watch(patternColorValue, (val: string) => {
-    globalConfig.setPatterColor(val)
-})
-watch(textColorValue, (val: string) => {
-    globalConfig.setTextColor(val)
-}, { deep: true })
-
-watch(cardSizeValue, (val: { width: number; height: number; }) => {
-    globalConfig.setCardSize(val)
-}, { deep: true }),
-    watch(isShowPrizeListValue, () => {
-        globalConfig.setIsShowPrizeList(isShowPrizeListValue.value)
+    watch(cardSizeValue, (val: { width: number; height: number; }) => {
+        globalConfig.setCardSize(val)
+    }, { deep: true }),
+        watch(isShowPrizeListValue, () => {
+            globalConfig.setIsShowPrizeList(isShowPrizeListValue.value)
+        })
+    onMounted(() => {
     })
-onMounted(() => {
-})
 </script>
 
 <template>
-     <dialog id="my_modal_1" ref="resetDataDialogRef" class="border-none modal">
+    <dialog id="my_modal_1" ref="resetDataDialogRef" class="border-none modal">
         <div class="modal-box">
             <h3 class="text-lg font-bold">提示!</h3>
             <p class="py-4">该操作会重置所有数据，是否继续？</p>
@@ -192,14 +192,15 @@ onMounted(() => {
             </div>
             <div>
                 <div class="tooltip" data-tip="该项比较耗费时间和性能">
-                    <button class="mt-5 btn btn-info btn-sm" :disabled="isRowCountChange != 1" @click="resetPersonLayout">
+                    <button class="mt-5 btn btn-info btn-sm" :disabled="isRowCountChange != 1"
+                        @click="resetPersonLayout">
                         <span>重设布局</span>
                         <span class="loading loading-ring loading-md" v-show="isRowCountChange == 2"></span>
                     </button>
                 </div>
             </div>
         </label>
-        <label class="w-full max-w-xs form-control">
+        <!-- <label class="w-full max-w-xs form-control">
             <div class="label">
                 <span class="label-text">选择主题</span>
             </div>
@@ -207,12 +208,13 @@ onMounted(() => {
                 <option disabled selected>选取主题</option>
                 <option v-for="(item, index) in themeList" :key="index" :value="item">{{ item }}</option>
             </select>
-        </label>
+        </label> -->
         <label class="w-full max-w-xs form-control">
             <div class="label">
                 <span class="label-text">卡片颜色</span>
             </div>
-            <ColorPicker ref="colorPickerRef" v-model="cardColorValue" v-model:pure-color="cardColorValue"></ColorPicker>
+            <ColorPicker ref="colorPickerRef" v-model="cardColorValue" v-model:pure-color="cardColorValue">
+            </ColorPicker>
         </label>
         <label class="w-full max-w-xs form-control">
             <div class="label">
@@ -226,7 +228,8 @@ onMounted(() => {
             <div class="label">
                 <span class="label-text">文字颜色</span>
             </div>
-            <ColorPicker ref="colorPickerRef" v-model="textColorValue" v-model:pure-color="textColorValue"></ColorPicker>
+            <ColorPicker ref="colorPickerRef" v-model="textColorValue" v-model:pure-color="textColorValue">
+            </ColorPicker>
         </label>
         <label class="flex flex-row w-full max-w-xs gap-10 mb-10 form-control">
             <div>
@@ -284,7 +287,8 @@ onMounted(() => {
             <div class="label">
                 <span class="label-text">是否常显奖品列表</span>
             </div>
-            <input type="checkbox" :checked="isShowPrizeListValue" @change="isShowPrizeListValue = !isShowPrizeListValue"
+            <input type="checkbox" :checked="isShowPrizeListValue"
+                @change="isShowPrizeListValue = !isShowPrizeListValue"
                 class="mt-2 border-solid checkbox checkbox-secondary border-1" />
         </label>
 
