@@ -1,146 +1,146 @@
 <script setup lang='ts'>
-import { ref, onMounted, watch } from 'vue'
-import useStore from '@/store'
-import { IPrizeConfig } from '@/types/storeType'
-import { storeToRefs } from 'pinia'
-import localforage from 'localforage'
-import EditSeparateDialog from '@/components/NumberSeparate/EditSeparateDialog.vue'
+    import { ref, onMounted, watch } from 'vue'
+    import useStore from '@/store'
+    import { IPrizeConfig } from '@/types/storeType'
+    import { storeToRefs } from 'pinia'
+    import localforage from 'localforage'
+    import EditSeparateDialog from '@/components/NumberSeparate/EditSeparateDialog.vue'
 
-const imageDbStore = localforage.createInstance({
-    name: 'imgStore'
-})
-const prizeConfig = useStore().prizeConfig
-const globalConfig = useStore().globalConfig
-const { getPrizeConfig: localPrizeList, getCurrentPrize: currentPrize } = storeToRefs(prizeConfig)
+    const imageDbStore = localforage.createInstance({
+        name: 'imgStore'
+    })
+    const prizeConfig = useStore().prizeConfig
+    const globalConfig = useStore().globalConfig
+    const { getPrizeConfig: localPrizeList, getCurrentPrize: currentPrize } = storeToRefs(prizeConfig)
 
-const { getImageList: localImageList } = storeToRefs(globalConfig)
-const prizeList = ref(localPrizeList)
-const imgList = ref<any[]>([])
+    const { getImageList: localImageList } = storeToRefs(globalConfig)
+    const prizeList = ref(localPrizeList)
+    const imgList = ref<any[]>([])
 
-const selectedPrize = ref<IPrizeConfig | null>()
+    const selectedPrize = ref<IPrizeConfig | null>()
 
-const addPrize = () => {
-    const defaultPrizeCOnfig: IPrizeConfig = {
-        id: new Date().getTime().toString(),
-        name: '奖项',
-        sort: 0,
-        isAll: false,
-        count: 1,
-        isUsedCount: 0,
-        picture: {
-            id: '',
-            name: '',
-            url: ''
-        },
-        separateCount: {
-            enable: false,
-            countList: []
-        },
-        desc: '',
-        isUsed: false,
-        isShow: true,
-        frequency: 1,
+    const addPrize = () => {
+        const defaultPrizeCOnfig: IPrizeConfig = {
+            id: new Date().getTime().toString(),
+            name: '奖项',
+            sort: 0,
+            isAll: false,
+            count: 1,
+            isUsedCount: 0,
+            picture: {
+                id: '',
+                name: '',
+                url: ''
+            },
+            separateCount: {
+                enable: false,
+                countList: []
+            },
+            desc: '',
+            isUsed: false,
+            isShow: true,
+            frequency: 1,
+        }
+        prizeConfig.addPrizeConfig(defaultPrizeCOnfig)
     }
-    prizeConfig.addPrizeConfig(defaultPrizeCOnfig)
-}
 
-const selectPrize = (item: IPrizeConfig) => {
-    selectedPrize.value = item
-    selectedPrize.value.isUsedCount = 0
-    selectedPrize.value.isUsed = false
+    const selectPrize = (item: IPrizeConfig) => {
+        selectedPrize.value = item
+        selectedPrize.value.isUsedCount = 0
+        selectedPrize.value.isUsed = false
 
-    if (selectedPrize.value.separateCount.countList.length > 1) {
-        return
-    }
-    selectedPrize.value.separateCount = {
-        enable: true,
-        countList: [
-            {
-                id: '0',
-                count: item.count,
-                isUsedCount: 0,
-            }
-        ]
-    }
-}
-
-const changePrizeStatus = (item: IPrizeConfig) => {
-    // if (item.isUsed == true) {
-    //     item.isUsedCount = 0;
-    //     if (item.separateCount && item.separateCount.countList.length) {
-    //         item.separateCount.countList.forEach((countItem: any) => {
-    //             countItem.isUsedCount = 0;
-    //         })
-    //     }
-    // }
-    // else {
-    //     item.isUsedCount = item.count;
-    //     if (item.separateCount && item.separateCount.countList.length) {
-    //         item.separateCount.countList.forEach((countItem: any) => {
-    //             countItem.isUsedCount = countItem.count;
-    //         })
-    //     }
-    // }
-    item.isUsed?item.isUsedCount=0:item.isUsedCount=item.count;
-    item.separateCount.countList = []
-    item.isUsed = !item.isUsed
-}
-
-const changePrizePerson = (item: IPrizeConfig) => {
-    let indexPrize = -1;
-    for (let i = 0; i < prizeList.value.length; i++) {
-        if (prizeList.value[i].id == item.id) {
-            indexPrize = i;
-            break;
+        if (selectedPrize.value.separateCount.countList.length > 1) {
+            return
+        }
+        selectedPrize.value.separateCount = {
+            enable: true,
+            countList: [
+                {
+                    id: '0',
+                    count: item.count,
+                    isUsedCount: 0,
+                }
+            ]
         }
     }
-    if (indexPrize > -1) {
-        prizeList.value[indexPrize].separateCount.countList = []
-        prizeList.value[indexPrize].isUsed?prizeList.value[indexPrize].isUsedCount=prizeList.value[indexPrize].count:prizeList.value[indexPrize].isUsedCount=0
-    }
-}
-const submitData = (value: any) => {
-    selectedPrize.value!.separateCount.countList = value;
-    selectedPrize.value = null
-}
-const resetDefault = () => {
-    prizeConfig.resetDefault()
-}
 
-const getImageDbStore = async () => {
-    const keys = await imageDbStore.keys()
-    if (keys.length > 0) {
-        imageDbStore.iterate((value, key) => {
-            imgList.value.push({
-                key,
-                value
+    const changePrizeStatus = (item: IPrizeConfig) => {
+        // if (item.isUsed == true) {
+        //     item.isUsedCount = 0;
+        //     if (item.separateCount && item.separateCount.countList.length) {
+        //         item.separateCount.countList.forEach((countItem: any) => {
+        //             countItem.isUsedCount = 0;
+        //         })
+        //     }
+        // }
+        // else {
+        //     item.isUsedCount = item.count;
+        //     if (item.separateCount && item.separateCount.countList.length) {
+        //         item.separateCount.countList.forEach((countItem: any) => {
+        //             countItem.isUsedCount = countItem.count;
+        //         })
+        //     }
+        // }
+        item.isUsed ? item.isUsedCount = 0 : item.isUsedCount = item.count;
+        item.separateCount.countList = []
+        item.isUsed = !item.isUsed
+    }
+
+    const changePrizePerson = (item: IPrizeConfig) => {
+        let indexPrize = -1;
+        for (let i = 0; i < prizeList.value.length; i++) {
+            if (prizeList.value[i].id == item.id) {
+                indexPrize = i;
+                break;
+            }
+        }
+        if (indexPrize > -1) {
+            prizeList.value[indexPrize].separateCount.countList = []
+            prizeList.value[indexPrize].isUsed ? prizeList.value[indexPrize].isUsedCount = prizeList.value[indexPrize].count : prizeList.value[indexPrize].isUsedCount = 0
+        }
+    }
+    const submitData = (value: any) => {
+        selectedPrize.value!.separateCount.countList = value;
+        selectedPrize.value = null
+    }
+    const resetDefault = () => {
+        prizeConfig.resetDefault()
+    }
+
+    const getImageDbStore = async () => {
+        const keys = await imageDbStore.keys()
+        if (keys.length > 0) {
+            imageDbStore.iterate((value, key) => {
+                imgList.value.push({
+                    key,
+                    value
+                })
             })
-        })
+        }
     }
-}
 
-const sort = (item: IPrizeConfig, isUp: number) => {
-    const itemIndex = prizeList.value.indexOf(item)
-    if (isUp == 1) {
-        prizeList.value.splice(itemIndex, 1)
-        prizeList.value.splice(itemIndex - 1, 0, item)
-    } else {
-        prizeList.value.splice(itemIndex, 1)
-        prizeList.value.splice(itemIndex + 1, 0, item)
+    const sort = (item: IPrizeConfig, isUp: number) => {
+        const itemIndex = prizeList.value.indexOf(item)
+        if (isUp == 1) {
+            prizeList.value.splice(itemIndex, 1)
+            prizeList.value.splice(itemIndex - 1, 0, item)
+        } else {
+            prizeList.value.splice(itemIndex, 1)
+            prizeList.value.splice(itemIndex + 1, 0, item)
+        }
     }
-}
-const delItem = (item: IPrizeConfig) => {
-    prizeConfig.deletePrizeConfig(item.id)
-}
-const delAll = async () => {
-    await prizeConfig.deleteAllPrizeConfig()
-}
-onMounted(() => {
-    getImageDbStore()
-})
-watch(() => prizeList.value, (val: IPrizeConfig[]) => {
-    prizeConfig.setPrizeConfig(val)
-}, { deep: true })
+    const delItem = (item: IPrizeConfig) => {
+        prizeConfig.deletePrizeConfig(item.id)
+    }
+    const delAll = async () => {
+        await prizeConfig.deleteAllPrizeConfig()
+    }
+    onMounted(() => {
+        getImageDbStore()
+    })
+    watch(() => prizeList.value, (val: IPrizeConfig[]) => {
+        prizeConfig.setPrizeConfig(val)
+    }, { deep: true })
 
 
 </script>
@@ -155,7 +155,8 @@ watch(() => prizeList.value, (val: IPrizeConfig[]) => {
 
         </div>
         <div role="alert" class="w-full my-4 alert alert-info">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 stroke-current shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                class="w-6 h-6 stroke-current shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
@@ -193,7 +194,7 @@ watch(() => prizeList.value, (val: IPrizeConfig[]) => {
                         <span class="label-text">抽奖人数</span>
                     </div>
                     <input type="number" v-model="item.count" placeholder="获奖人数" @change="changePrizePerson(item)"
-                        class="w-full max-w-xs p-0 m-0 input-sm input input-bordered" />
+                        class="w-full max-w-xs p-0 m-0 input-sm input input-bordered text-center" />
                     <div class="tooltip tooltip-bottom" :data-tip="'已抽取:' + item.isUsedCount + '/' + item.count">
                         <progress class="w-full progress" :value="item.isUsedCount" :max="item.count"></progress>
                     </div>
@@ -253,8 +254,8 @@ watch(() => prizeList.value, (val: IPrizeConfig[]) => {
                 </label>
             </li>
         </ul>
-        <EditSeparateDialog :totalNumber="selectedPrize?.count" :separated-number="selectedPrize?.separateCount.countList"
-            @submitData="submitData" />
+        <EditSeparateDialog :totalNumber="selectedPrize?.count"
+            :separated-number="selectedPrize?.separateCount.countList" @submitData="submitData" />
     </div>
 </template>
 
