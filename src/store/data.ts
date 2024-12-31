@@ -19,7 +19,7 @@ export const defaultPrizeList = <IPrizeConfig[]>[
         picture: {
             id: '2',
             name: '三等奖',
-            url: '@/../static/image/image3.png'
+            url: 'https://1kw20.fun/resource/image/image3.png'
         },
         separateCount: {
             enable: true,
@@ -49,7 +49,7 @@ export const defaultPrizeList = <IPrizeConfig[]>[
         picture: {
             id: '1',
             name: '二等奖',
-            url: '@/../static/image/image2.png'
+            url: 'https://1kw20.fun/resource/image/image2.png'
         },
         separateCount: {
             enable: true,
@@ -77,7 +77,7 @@ export const defaultPrizeList = <IPrizeConfig[]>[
         picture: {
             id: '0',
             name: '一等奖',
-            url: '@/../static/image/image1.png'
+            url: 'https://1kw20.fun/resource/image/image1.png'
         },
         separateCount: {
             enable: true,
@@ -102,7 +102,7 @@ export const defaultPrizeList = <IPrizeConfig[]>[
         picture: {
             id: '3',
             name: '特等奖',
-            url: '@/../static/image/image4.png'
+            url: 'https://1kw20.fun/resource/image/image4.png'
         },
         separateCount: {
             enable: true,
@@ -126,7 +126,7 @@ export const defaultCurrentPrize = <IPrizeConfig>{
     picture: {
         id: '2',
         name: '三等奖',
-        url: '@/../static/image/image3.png'
+        url: 'https://1kw20.fun/resource/image/image3.png'
     },
     separateCount: {
         enable: true,
@@ -163,22 +163,27 @@ export const defaultImageList = [
     {
         id: '0',
         name: '一等奖',
-        url: '@/../static/image/image1.png'
+        url: 'https://1kw20.fun/resource/image/image1.png'
     },
     {
         id: '1',
         name: '二等奖',
-        url: '@/../static/image/image2.png'
+        url: 'https://1kw20.fun/resource/image/image2.png'
     },
     {
         id: '2',
         name: '三等奖',
-        url: '@/../static/image/image3.png'
+        url: 'https://1kw20.fun/resource/image/image3.png'
     },
     {
         id: '3',
-        name: '特等奖',
-        url: '@/../static/image/image4.png'
+        name: '超级奖',
+        url: 'https://1kw20.fun/resource/image/image4.png'
+    },
+    {
+        id: '4',
+        name: '特别奖',
+        url: 'https://1kw20.fun/resource/image/image5.png'
     }
 ]
 export const defaultPatternList = [21, 38, 55, 54, 53, 70, 87, 88, 89, 23, 40, 57, 74, 91, 92, 93, 76, 59, 42, 25, 24, 27, 28, 29, 46, 63, 62, 61, 78, 95, 96, 97, 20, 19, 31, 48, 65, 66, 67, 84, 101, 100, 99, 32, 33]
