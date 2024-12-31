@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { configRoutes } from '../../router';
+    import { ref } from 'vue';
+    import { useRouter, useRoute } from 'vue-router';
+    import { configRoutes } from '../../router';
 
 
-const router = useRouter();
-const route = useRoute();
-const menuList = ref<any[]>(configRoutes.children)
+    const router = useRouter();
+    const route = useRoute();
+    const menuList = ref<any[]>(configRoutes.children)
 
-const cleanMenuList = (menu: any) => {
-    const newList = menu;
-    for (let i = 0; i < newList.length; i++) {
-        if (newList[i].children) {
-            cleanMenuList(newList[i].children);
+    const cleanMenuList = (menu: any) => {
+        const newList = menu;
+        for (let i = 0; i < newList.length; i++) {
+            if (newList[i].children) {
+                cleanMenuList(newList[i].children);
+            }
+            if (!newList[i].meta) {
+                newList.splice(i, 1);
+                i--;
+            }
         }
-        if (!newList[i].meta) {
-            newList.splice(i, 1);
-            i--;
-        }
+
+        return newList;
     }
 
-    return newList;
-}
+    menuList.value = cleanMenuList(menuList.value);
 
-menuList.value = cleanMenuList(menuList.value);
-
-const skip = (path: string) => {
-    router.push(path);
-}
+    const skip = (path: string) => {
+        router.push(path);
+    }
 
 
 </script>
@@ -57,12 +57,13 @@ const skip = (path: string) => {
                     </ul>
                 </details>
                 <a v-else @click="skip(item.path)"
-                    :style="item.name == route.name ? 'background-color:rgba(12,12,12,0.2)' : ''">{{ item.meta!.title }}</a>
+                    :style="item.name == route.name ? 'background-color:rgba(12,12,12,0.2)' : ''">{{ item.meta!.title
+                    }}</a>
             </li>
         </ul>
         <router-view class="mt-5"></router-view>
     </div>
-    <footer class="p-10 rounded footer footer-center bg-base-200 text-base-content">
+    <!-- <footer class="p-10 rounded footer footer-center bg-base-200 text-base-content">
         <nav class="grid grid-flow-col gap-4">
             <a class="cursor-pointer link link-hover text-inherit" target="_blank" href="https://1kw20.fun">行有不得，反求诸己</a>
         </nav>
@@ -85,7 +86,7 @@ const skip = (path: string) => {
             <p class="p-0 m-0">蜀ICP备2021028666号</p>
             <p>Copyright © 2024 - All right reserved by Log1997</p>
         </aside>
-    </footer>
+    </footer> -->
 </template>
 
 <style scoped></style>

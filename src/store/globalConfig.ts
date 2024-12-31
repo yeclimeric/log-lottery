@@ -8,7 +8,7 @@ export const useGlobalConfig = defineStore('global', {
             globalConfig: {
                 rowCount: 17,
                 isSHowPrizeList: true,
-                topTitle: '大明内阁六部御前奏对',
+                topTitle: '年会抽奖',
                 theme: {
                     name: 'dracula',
                     detail: { primary: '#0f5fd3' },
